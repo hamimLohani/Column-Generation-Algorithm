@@ -101,6 +101,7 @@ public class Main {
             String overStr = scanner.nextLine().trim();
             double overPenalty = overStr.isEmpty() ? 120.0 : Double.parseDouble(overStr);
 
+            System.out.println(flights.get(0));
 
         } catch (IOException e) {
             System.err.println("IO Error: " + e.getMessage());
