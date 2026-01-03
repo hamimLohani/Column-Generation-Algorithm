@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Pricing {
+public class Pairing {
     private List<Flight> flights;
     private double cost;
 
-    public Pricing() {
+    public Pairing() {
         this.flights = new ArrayList<>();
         this.cost = 0.0;
     }
 
-    public Pricing(List<Flight> flights, double cost) {
+    public Pairing(List<Flight> flights, double cost) {
         this.flights = flights;
         this.cost = cost;
     }
