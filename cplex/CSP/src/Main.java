@@ -101,10 +101,25 @@ public class Main {
             String overStr = scanner.nextLine().trim();
             double overPenalty = overStr.isEmpty() ? 120.0 : Double.parseDouble(overStr);
 
-            System.out.println(flights.get(0));
+            System.out.println("Max columns per iteration (default: 50)");
+            System.out.print(":: ");
+            String maxColsStr = scanner.nextLine().trim();
+            int maxCols = maxColsStr.isEmpty() ? 50 : Integer.parseInt(maxColsStr);
+
+            // initialization
+            PricingProblem pricing = new PricingProblem(flights, base, maxDuty, maxFly, minTurn, allowOvernight,
+                    fixedCost, hourlyCost, nightPenalty, overPenalty);
+
+            ColumnGenerationSolver solver = new ColumnGenerationSolver(flights, pricing, maxCols);
+
+            solver.solve();
+            solver.printSolution();
 
         } catch (IOException e) {
             System.err.println("IO Error: " + e.getMessage());
+        } catch (IloException e) {
+            System.err.println("CPLEX Error: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();

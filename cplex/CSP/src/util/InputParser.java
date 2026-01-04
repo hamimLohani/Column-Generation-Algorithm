@@ -26,10 +26,9 @@ public class InputParser {
                 }
 
                 String[] parts = line.split(",");
-                if (parts.length < 10) {
+                if (parts.length < 10)
                     continue;
-                }
-                
+
                 // FlightID,From,To,DepTime,ArrTime,Duration,Aircraft,Base,FlightCost,Night
                 String id = parts[0].trim();
                 String from = parts[1].trim();

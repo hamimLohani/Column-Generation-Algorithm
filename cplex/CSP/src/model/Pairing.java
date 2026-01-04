@@ -14,7 +14,7 @@ public class Pairing {
     }
 
     public Pairing(List<Flight> flights, double cost) {
-        this.flights = flights;
+        this.flights = new ArrayList<>(flights);
         this.cost = cost;
     }
 
@@ -35,14 +35,14 @@ public class Pairing {
     }
 
     public Flight getLastFlight() {
-        if (flights.isEmpty()) {
+        if (flights.isEmpty())
             return null;
-        }
         return flights.get(flights.size() - 1);
     }
 
     @Override
     public String toString() {
-        return flights.stream().map(Flight::getFlightId).collect(Collectors.joining("-")) + " ($" + cost + ")";
+        return flights.stream().map(Flight::getFlightId).collect(Collectors.joining("-"))
+                + " ($" + cost + ")";
     }
 }
