@@ -101,7 +101,7 @@ public class Main {
             String overStr = scanner.nextLine().trim();
             double overPenalty = overStr.isEmpty() ? 120.0 : Double.parseDouble(overStr);
 
-            System.out.println("Max columns per iteration (default: 50)");
+            System.out.println("Max columns(flights) per iteration (default: 50)");
             System.out.print(":: ");
             String maxColsStr = scanner.nextLine().trim();
             int maxCols = maxColsStr.isEmpty() ? 50 : Integer.parseInt(maxColsStr);

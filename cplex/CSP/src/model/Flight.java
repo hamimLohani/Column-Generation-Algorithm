@@ -29,16 +29,36 @@ public class Flight {
         this.isNight = (night == 1);
     }
 
-    public String getFlightId() { return flightId; }
-    public String getFrom() { return from; }
-    public String getTo() { return to; }
-    public LocalTime getDepTime() { return depTime; }
-    public LocalTime getArrTime() { return arrTime; }
-    public double getDurationHours() { return durationHours; }
-    public String getAircraft() { return aircraft; }
-    public String getBase() { return base; }
-    public double getFlightCost() { return flightCost; }
-    public boolean isNight() { return isNight; }
+    public String getFlightId() {
+        return flightId;
+    }
+    public String getFrom() {
+        return from;
+    }
+    public String getTo() {
+        return to;
+    }
+    public LocalTime getDepTime() {
+        return depTime;
+    }
+    public LocalTime getArrTime() {
+        return arrTime;
+    }
+    public double getDurationHours() {
+        return durationHours;
+    }
+    public String getAircraft() {
+        return aircraft;
+    }
+    public String getBase() {
+        return base;
+    }
+    public double getFlightCost() {
+        return flightCost;
+    }
+    public boolean isNight() {
+        return isNight;
+    }
 
     @Override
     public String toString() {

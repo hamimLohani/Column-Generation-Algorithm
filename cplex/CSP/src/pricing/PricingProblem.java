@@ -15,23 +15,22 @@ public class PricingProblem {
     private List<Flight> allFlights;
     private String base;
 
-    // Constraints
+    // constraints
     private double maxDutyHours;
     private double maxFlyingHours;
     private long minTurnaroundMin;
     private boolean allowOvernight;
 
-    // Cost Parameters
+    // cost parameters
     private double fixedCost;
     private double hourlyCost;
     private double nightPenalty;
     private double overtimePenaltyPerHour;
 
-    public PricingProblem(List<Flight> allFlights, String base,
-            double maxDutyHours, double maxFlyingHours, long minTurnaroundMin, boolean allowOvernight,
-            double fixedCost, double hourlyCost, double nightPenalty, double overtimePenaltyPerHour) {
+    public PricingProblem(List<Flight> allFlights, String base, double maxDutyHours, double maxFlyingHours,
+                          long minTurnaroundMin, boolean allowOvernight, double fixedCost, double hourlyCost, double nightPenalty, double overtimePenaltyPerHour) {
         this.allFlights = new ArrayList<>(allFlights);
-        // Sort flights by time to help logic
+        // sort flights by departure time
         this.allFlights.sort(Comparator.comparing(Flight::getDepTime));
 
         this.base = base;
@@ -46,18 +45,18 @@ public class PricingProblem {
         this.overtimePenaltyPerHour = overtimePenaltyPerHour;
     }
 
-    /**
-     * Solves the RCSP to find pairings with negative reduced cost.
+    /*
+     * solves the RCSP(Resource Constrained Shortest Path) to find pairings with negative reduced cost.
      * 
-     * @param duals Dual values from RMP, indexed corresponding to allFlights list
-     *              (or map)
-     * @return List of generated pairings
+     * dual values from RMP(Restricted Master Problem), indexed corresponding to allFlights list (or map)
+     *
+     * list of generated pairings
      */
     public List<Pairing> solve(Map<String, Double> dualMap) {
         List<Pairing> newColumns = new ArrayList<>();
 
-        // Simple DFS approach to find valid pairings
-        // Start from any flight departing from BASE
+        // simple DFS approach to find valid pairings
+        // start from any flight departing from BASE
         for (Flight f : allFlights) {
             if (f.getFrom().equals(base)) {
                 List<Flight> path = new ArrayList<>();
@@ -69,48 +68,36 @@ public class PricingProblem {
         return newColumns;
     }
 
-    // We need duals by Flight ID probably, or index. Let's use Map<String, Double>
-    // dualMap in signature.
-    // Overloading to match what I wrote above (which might mismatch RMP if RMP uses
-    // index)
-    // RMP uses List<Flight>, so I can map index to ID. Let's assume RMP passes a
-    // Map.
+    // we need duals by Flight ID probably, or index. Map<flight_ID, duals> dualMap
+    // overloading to match what I wrote above (which might mismatch RMP if RMP uses index)
+    // RMP uses List<Flight>, so I can map index to ID. Let's assume RMP passes a Map.
 
     private void dfs(Flight current, List<Flight> currentPath, double currentFlyingTime,
             Map<String, Double> duals, List<Pairing> solutions) {
 
-        // Check if we can close the pairing (return to Base)
+        // check if we can close the pairing to Base
         if (current.getTo().equals(base)) {
-            // Check full duty validity & Cost
+            // crheck full duty validity & Cost
             double dutyTime = calculateDutyTime(currentPath);
             if (dutyTime <= maxDutyHours) {
                 Pairing p = createPairing(currentPath);
                 double redCost = calculateReducedCost(p, duals);
-                if (redCost < -0.0001) { // Negative reduced cost
+                if (redCost < -0.0001) { // negative reduced cost
                     solutions.add(p);
-                    // Heuristic: Don't just return, keep searching?
-                    // Or maybe limit number of columns?
-                    // For simple DFS, finding all might be too many.
-                    // Let's cap solutions or just continue.
-                    // For this "CLI Tool" simple version, we'll collect them.
                 }
             }
         }
 
-        // Try to extend
+        // try to extend
         for (Flight next : allFlights) {
             if (isValidConnection(current, next)) {
-                // Check flying time
+                // check flying time
                 if (currentFlyingTime + next.getDurationHours() <= maxFlyingHours) {
-                    // Check duty time rough (accumulated) - accurate check needed at end?
-                    // Better to check as we go if possible.
-                    // Assuming single duty day for simplicity unless overnight allowed.
+                    // check duty time
+                    // assuming single duty day for simplicity unless overnight allowed.
 
-                    // If overnight not allowed, next flight must be same day (dep > arr)
-                    // If simple time model (00:00-24:00), dep > arr is sufficient check for same
-                    // day sequence?
-                    // Actually TimeUtils handles times. If next.dep < current.arr, it implies next
-                    // day (or impossible same day).
+                    // if overnight not allowed, next flight must be same day (dep > arr)
+                    // TimeUtils handles times. If next.dep < current.arr, it implies next day (or impossible same day).
 
                     currentPath.add(next);
                     dfs(next, currentPath, currentFlyingTime + next.getDurationHours(), duals, solutions);
@@ -121,11 +108,11 @@ public class PricingProblem {
     }
 
     private boolean isValidConnection(Flight f1, Flight f2) {
-        // Location connection
+        // location connection
         if (!f1.getTo().equals(f2.getFrom()))
             return false;
 
-        // Time connection
+        // time connection
         long turn = TimeUtils.minutesBetween(f1.getArrTime(), f2.getDepTime());
         if (turn < minTurnaroundMin)
             return false;
@@ -137,9 +124,6 @@ public class PricingProblem {
         if (f2.getDepTime().isBefore(f1.getArrTime())) {
             if (!allowOvernight)
                 return false;
-            // If overnight allowed, we need logic for "how many overnights".
-            // For this simple scope, let's assume strict daily or strict "next valid
-            // flight".
         }
         return true;
     }
